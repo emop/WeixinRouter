@@ -4,3 +4,9 @@
 *.jar
 *.war
 *.ear
+
+src/org/emop/weixin/Version.java
+bin/*
+build/*
+
+test_key

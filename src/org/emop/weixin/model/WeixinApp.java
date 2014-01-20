@@ -22,7 +22,7 @@ import org.json.simple.JSONObject;
 public class WeixinApp {
 	public long loadTime = 0;
 	
-	private static Log log = LogFactory.getLog("wx.app");
+	protected static Log log = LogFactory.getLog("wx.app");
 
 	public int appId = 0;
 	public String appUrl = null;

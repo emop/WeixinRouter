@@ -1,5 +1,6 @@
 package org.emop.weixin.message;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +9,10 @@ import java.util.Map;
 import org.emop.weixin.model.WeixinApp;
 import org.emop.weixin.router.WeixinAccount;
 import org.emop.weixin.router.WeixinUser;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
 
 public class WeixinMessage implements Cloneable {
 	public static final String MSG_TEXT = "text";
@@ -64,18 +69,22 @@ public class WeixinMessage implements Cloneable {
 	
 	
 	public void writeTo(PrintWriter writer){
-		long writeTime = System.currentTimeMillis() / 1000;
-		writer.println("<xml>");
-		writer.println("<ToUserName><![CDATA[" + toUserName + "]]></ToUserName>");
-		writer.println("<FromUserName><![CDATA[" + fromUserName + "]]></FromUserName>");
-		writer.println("<CreateTime><![CDATA[" + writeTime + "]]></CreateTime>");
-		if(msgType == null || msgType.equals("")){
-			msgType = "text";
+		if(this.formate.equals("xml")){
+			writer.write(rawData);
+		}else {
+			long writeTime = System.currentTimeMillis() / 1000;
+			writer.println("<xml>");
+			writer.println("<ToUserName><![CDATA[" + toUserName + "]]></ToUserName>");
+			writer.println("<FromUserName><![CDATA[" + fromUserName + "]]></FromUserName>");
+			writer.println("<CreateTime><![CDATA[" + writeTime + "]]></CreateTime>");
+			if(msgType == null || msgType.equals("")){
+				msgType = "text";
+			}
+			writer.println("<MsgType><![CDATA[" + msgType + "]]></MsgType>");
+			writeMessageBody(writer);
+			
+			writer.println("</xml>");	
 		}
-		writer.println("<MsgType><![CDATA[" + msgType + "]]></MsgType>");
-		writeMessageBody(writer);
-		
-		writer.println("</xml>");		
 	}
 	
 	protected void writeMessageBody(PrintWriter writer){
@@ -116,6 +125,27 @@ public class WeixinMessage implements Cloneable {
 			content = "APP no response";
 		}
 		writer.println("<Content><![CDATA[" + content + "]]></Content>");
+	}
+	
+	public void parseXMLData() throws IOException{
+		SAXBuilder builder = new SAXBuilder();
+
+		Document doc = null;
+		try {
+			doc = builder.build(rawData);
+		} catch (JDOMException e1) {
+		}
+		List<Element> elements = null;
+		if(doc != null){
+			elements = doc.getRootElement().getChildren();
+			for(Element e: elements){
+				data.put(e.getName(), e.getText());
+			}
+			fromUserName = data.get("FromUserName");
+			toUserName = data.get("ToUserName");
+			msgId = data.get("MsgId");
+			msgType = data.get("MsgType");
+		}
 	}
 	
 	public WeixinMessage copy(){

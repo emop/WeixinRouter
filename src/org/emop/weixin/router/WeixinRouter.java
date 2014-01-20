@@ -1,9 +1,8 @@
 package org.emop.weixin.router;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,11 +29,8 @@ import org.emop.weixin.monitor.Benchmark;
 import org.emop.weixin.router.interceptor.FansCount;
 import org.emop.weixin.utils.Cache;
 import org.emop.weixin.utils.impl.SimpleCache;
-import org.jdom2.Document;
-import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 import org.mortbay.util.ajax.ContinuationSupport;
-import org.xml.sax.InputSource;
 
 /**
  * 微信消息路由器。把从HTTP 进来的请求，封装到一个RouteRequest， 然后交给路由线程池处理。这样可以
@@ -142,22 +138,18 @@ public class WeixinRouter {
 
 	
 	protected WeixinMessage parseMessage(HttpServletRequest request){
-		SAXBuilder builder = new SAXBuilder();
 		WeixinMessage msg = new WeixinMessage();
 		try {
-			InputSource source = new InputSource(new InputStreamReader(request.getInputStream(), "UTF-8")); 
-			Document doc = builder.build(source);
-			List<Element> elements = null;
-			if(doc != null){
-				elements = doc.getRootElement().getChildren();
-				for(Element e: elements){
-					msg.data.put(e.getName(), e.getText());
-				}
-				msg.fromUserName = msg.data.get("FromUserName");
-				msg.toUserName = msg.data.get("ToUserName");
-				msg.msgId = msg.data.get("MsgId");
-				msg.msgType = msg.data.get("MsgType");
+			InputStream ins = request.getInputStream();
+			ByteArrayOutputStream buffer = new ByteArrayOutputStream(64 * 1024);
+			byte[] tmp = new byte[1024 * 16];
+			for(int i = 0; i >= 0;){
+				i = ins.read(tmp);
+				buffer.write(tmp, 0, i);
 			}
+			buffer.close();
+			msg.rawData = new String(buffer.toByteArray(), "utf8");
+			msg.parseXMLData();
 		} catch (Exception e) {
 			log.error(e.toString(), e);
 		}

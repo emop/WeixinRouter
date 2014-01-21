@@ -10,3 +10,14 @@ WeixinRouter
 *  支持接口统计功能
 *  支持友好的错误提示，应用接口超时。会返回微信客户端信息。
 *  支持多个应用接口集成。
+
+
+
+路由规则配置
+==========
+
+例子:
+```bash
+route -A input -type text -content liu -j forward -app_type xml -app_url http://wx2.emop.cn/route/51/3000052/1357 -app_token cb05694fd559dcfbacbac57ae2547733
+route -A input -type text -content liu -j forward -app_type json -app_url http://emopselljd.sinaapp.com/api/wx_reply -app_token cb05694fd559dcfbacbac57ae2547733
+```

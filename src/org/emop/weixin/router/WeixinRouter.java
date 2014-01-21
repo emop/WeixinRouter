@@ -160,7 +160,7 @@ public class WeixinRouter {
 			buffer.close();
 			msg.rawData = new String(buffer.toByteArray(), "utf8");
 			if(log.isDebugEnabled()){
-				log.info("read msg:" + msg.rawData);
+			//	log.info("read msg:" + msg.rawData);
 			}
 			msg.parseXMLData();
 		} catch (Exception e) {

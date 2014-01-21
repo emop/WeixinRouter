@@ -29,8 +29,10 @@ public class HTTPResult {
 				o = v.get(k);
 				if(o instanceof JSONObject){
 					v = (JSONObject)o;
-				}else{
+				}else if(o != null){
 					str = o.toString();
+				}else {
+					str = "";
 				}
 			}
 		}

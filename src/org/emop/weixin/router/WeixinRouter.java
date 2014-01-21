@@ -4,8 +4,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,6 +30,7 @@ import org.emop.weixin.model.DataService;
 import org.emop.weixin.model.TaodianApi;
 import org.emop.weixin.model.WeixinApp;
 import org.emop.weixin.monitor.Benchmark;
+import org.emop.weixin.monitor.marks.WeixinRequest;
 import org.emop.weixin.router.interceptor.FansCount;
 import org.emop.weixin.utils.Cache;
 import org.emop.weixin.utils.impl.SimpleCache;
@@ -466,6 +470,12 @@ public class WeixinRouter {
 		RouteTable r = dataService.getRouteTable(s.toString());
 		
 		if(r != null){
+			p.println("=============根应用=============");
+			if(r.root != null){
+				p.println("app id:" + r.root.appId);
+				p.println("app url:" + r.root.appUrl);
+				p.println("");
+			}
 			p.println("=============转发规则表=============");
 			r.router.dump(p);
 			p.println("=============用户会话=============");
@@ -476,7 +486,27 @@ public class WeixinRouter {
 					WeixinApp app = (WeixinApp)o;
 					p.println(key + "-->" + app.appUrl + ", status:" + app.status + ", exit_code:" + app.exitCommand);
 				}
-			}			
+			}		
+			p.println("");
+			p.println("=============消息记录=============");
+			DateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+
+			for(Benchmark item: r.history.list()){
+				WeixinMessage msg = (WeixinMessage)item.obj;
+				String tmp = msg != null ? msg.data.get(WeixinMessage.CONTENT) : "";
+				tmp = tmp == null ? "" : tmp;
+				tmp = tmp.replace("\n", "\\n");
+				tmp = tmp.substring(0, Math.min(120, tmp.length()));
+				String line = String.format("%s [%s] type:%-8s, event:%s, key:%s, content:%s", 
+						sdf2.format(new Date(item.start)),
+						msg.fromUserName,
+						msg != null ? msg.msgType : "",
+						msg.data.get("Event"),
+						msg.data.get("EventKey"),
+					    tmp
+						);
+				p.println(line);
+			}
 		}else {
 			response.getWriter().println("没有找到应用会话, uri:" + s.toString());
 		}

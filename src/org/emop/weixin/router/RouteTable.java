@@ -8,6 +8,8 @@ import org.apache.commons.logging.LogFactory;
 import org.emop.weixin.message.WeixinMessage;
 import org.emop.weixin.model.WeixinApp;
 import org.emop.weixin.model.XmlWeixinApp;
+import org.emop.weixin.monitor.Benchmark;
+import org.emop.weixin.monitor.MaxSizeQueue;
 import org.emop.weixin.utils.Cache;
 import org.emop.weixin.utils.impl.SimpleCache;
 import org.emop.wx.router.Action;
@@ -29,12 +31,17 @@ public class RouteTable {
 	private boolean isnew = true;
 	public Router router = new DefaultRouter();
 	public Cache cache = new SimpleCache();
+	public WeixinApp root = null;
+	public MaxSizeQueue history = new MaxSizeQueue(10);
 	
 	public boolean isNew(){
 		return isnew;
 	}
 	
 	public  WeixinApp route(WeixinMessage msg, WeixinApp root, WeixinAccount account, WeixinUser user){
+		this.root = root;
+		Benchmark b = Benchmark.start("root", msg);
+		
 		String curApp = user.userID;
 		Object obj = cache.get(curApp, true);
 		if(obj != null){
@@ -54,9 +61,12 @@ public class RouteTable {
 			String content = msg.data.get(WeixinMessage.CONTENT);
 			if(msg.isText() && content != null && content.trim().equalsIgnoreCase(tmp.exitCommand)){
 				cache.remove(user.userID);
-				return root;
-			}			
+				//return root;
+				obj = null;
+			}
 		}
+		b.done();
+		history.add(b);
 		
 		if(obj == null || !(obj instanceof WeixinApp)){
 			return root;

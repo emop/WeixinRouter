@@ -148,6 +148,7 @@ public class DefaultRouter implements Router {
 
 	@Override
 	public void dump(PrintWriter writer) {
+		if(input == null) return;
 		
 		writer.println();
 		for(Rule r : input.rules()){

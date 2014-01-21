@@ -3,6 +3,7 @@ package org.emop.weixin.router;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,7 +30,6 @@ import org.emop.weixin.monitor.Benchmark;
 import org.emop.weixin.router.interceptor.FansCount;
 import org.emop.weixin.utils.Cache;
 import org.emop.weixin.utils.impl.SimpleCache;
-import org.jdom2.input.SAXBuilder;
 import org.mortbay.util.ajax.ContinuationSupport;
 
 /**
@@ -451,6 +451,35 @@ public class WeixinRouter {
 		}
 		
 		return resp;
+	}
+	
+	public void sessionStatus(final HttpServletRequest request, final HttpServletResponse response) throws IOException{
+		PrintWriter p = response.getWriter();
+		RouteSession s = null;
+		try{
+			s = parseSession(request);
+		}catch(Throwable e){
+			p.println("错误的会话。");
+			return;
+		}
+		
+		RouteTable r = dataService.getRouteTable(s.toString());
+		
+		if(r != null){
+			p.println("=============转发规则表=============");
+			r.router.dump(p);
+			p.println("=============用户会话=============");
+			
+			for(String key: r.cache.keys()){
+				Object o = r.cache.get(key);
+				if(o != null && o instanceof WeixinApp){
+					WeixinApp app = (WeixinApp)o;
+					p.println(key + "-->" + app.appUrl + ", status:" + app.status + ", exit_code:" + app.exitCommand);
+				}
+			}			
+		}else {
+			response.getWriter().println("没有找到应用会话, uri:" + s.toString());
+		}
 	}
 	
 	/**

@@ -27,8 +27,8 @@ public class RouteTable {
 	private static Log log = LogFactory.getLog("wx.route");
 	
 	private boolean isnew = true;
-	private Router router = new DefaultRouter();
-	private Cache cache = new SimpleCache();
+	public Router router = new DefaultRouter();
+	public Cache cache = new SimpleCache();
 	
 	public boolean isNew(){
 		return isnew;

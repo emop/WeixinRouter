@@ -63,8 +63,11 @@ public class HttpServer {
         //handler.addServletWithMapping("org.http.channel.server.servlet.CommandServlet", "/~/*");
         handler.addServletWithMapping("org.emop.weixin.router.servlet.ImageProxyServlet", "/img/*");
         handler.addServletWithMapping("org.emop.weixin.router.servlet.RouterServlet", "/route/*");
+        handler.addServletWithMapping("org.emop.weixin.router.servlet.SessionStatusServlet", "/ss/*");
         handler.addServletWithMapping("org.emop.weixin.router.servlet.ApiServlet", "/api/*");
         handler.addServletWithMapping("org.emop.weixin.router.servlet.StatusServlet", "/status/*");
+        handler.addServletWithMapping("org.emop.weixin.router.servlet.IndexServlet", "/*");
+
         try {
         	log.info("Start http server at " + httpPort);
 			server.start();

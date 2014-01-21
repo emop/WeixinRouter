@@ -37,6 +37,10 @@ public class RouteTable {
 	public  WeixinApp route(WeixinMessage msg, WeixinApp root, WeixinAccount account, WeixinUser user){
 		String curApp = user.userID;
 		Object obj = cache.get(curApp, true);
+		if(obj != null){
+			log.debug("get session app for user:" + user.userID + ", app:" + obj);
+		}
+		
 		if(obj == null || !(obj instanceof WeixinApp)){
 			TargetURL t = router.route(msg);
 			if(t != null && t.isOK){
@@ -45,15 +49,16 @@ public class RouteTable {
 					cache.set(user.userID, obj, 60 * 30);
 				}
 			}
-		}
-		if(obj == null || !(obj instanceof WeixinApp)){
-			return root;
+		}else {	//如果存在已经关联的会话，检查是否遇到退出会话的命令。如果是退出命令，就删除会话回到根菜单。
+			WeixinApp tmp = (WeixinApp)obj;
+			String content = msg.data.get(WeixinMessage.CONTENT);
+			if(msg.isText() && content != null && content.trim().equalsIgnoreCase(tmp.exitCommand)){
+				cache.remove(user.userID);
+				return root;
+			}			
 		}
 		
-		WeixinApp tmp = (WeixinApp)obj;
-		String content = msg.data.get(WeixinMessage.CONTENT);
-		if(msg.isText() && content != null && content.trim().equalsIgnoreCase(tmp.exitCommand)){
-			cache.remove(user.userID);
+		if(obj == null || !(obj instanceof WeixinApp)){
 			return root;
 		}
 		
@@ -61,6 +66,13 @@ public class RouteTable {
 	}
 	
 	public WeixinMessage postProcess(WeixinMessage resp, WeixinApp app, WeixinAccount account, WeixinUser user){
+		if(isnew){
+			try {
+				router.initRoute();
+			} catch (RouteException e) {
+				log.error("init route:" + e.toString(), e);
+			}
+		}
 		isnew = false;
 		String s = resp.getMessageFormate();
 		if(s != null && s.equals("json")){
@@ -68,7 +80,7 @@ public class RouteTable {
 				if(log.isDebugEnabled()){
 					log.debug("process command user:" + user.userID + ", command:" + resp.command);
 				}
-				for(String c : resp.command.split("\n")){
+				for(String c : resp.command.split("\\n")){
 					c = c.trim();
 					if(c.length() == 0 || c.startsWith("#")) continue;
 					processCommandLine(c, user.userID);
@@ -80,6 +92,9 @@ public class RouteTable {
 	}
 	
 	protected void processCommandLine(String cli, String userId){
+		if(log.isDebugEnabled()){
+			log.debug("cmd:" + cli);
+		}
 		if(cli.startsWith("route")){
 			try {
 				router.updateRouteTable(cli);
@@ -122,7 +137,11 @@ public class RouteTable {
 		
 		app.appUrl = r.url;
 		app.appKey = r.token;
-		app.exitCommand = r.retCmd;
+		if(r.retCmd != null && r.retCmd.length() > 0){
+			app.exitCommand = r.retCmd;
+		}else {
+			app.exitCommand = "q";
+		}
 		
 		return app;
 	}

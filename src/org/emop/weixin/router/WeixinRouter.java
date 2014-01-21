@@ -104,7 +104,13 @@ public class WeixinRouter {
 			req.msg = parseMessage(request);
 		}
 		
-		if(workerPool.getQueue().remainingCapacity() > 10){
+		/**
+		 * 避免XML转发规则，把消息转发给自己。导致递归调用。在XmlWexinApp里面设置这个调用头信息。
+		 */
+		String from =request.getHeader("X-from-WexinGate");
+		boolean isRecurse = from != null && from.equals("xml");
+		
+		if(workerPool.getQueue().remainingCapacity() > 10 && !isRecurse){
 			req.continuation =  ContinuationSupport.getContinuation(request, null); 
 			pendingTask.add(req);		
 			workerPool.execute(new Runnable(){

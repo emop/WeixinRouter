@@ -37,7 +37,8 @@ public class XmlWeixinApp extends WeixinApp {
 			conn = new URL(url).openConnection();
 			conn.setConnectTimeout(1000 * 30);
 			conn.setReadTimeout(1000 * 30);
-				
+			
+			conn.setRequestProperty("X-from-WexinGate", "xml");
 			conn.setRequestProperty("Content-Type", "application/xml");
 			conn.setDoOutput(true);
 			OutputStream out = conn.getOutputStream(); //new PrintWriter(buffer);
@@ -55,7 +56,11 @@ public class XmlWeixinApp extends WeixinApp {
 			}
 			buffer.close();
 			
+			//if(log.d)
+			
 			resp.rawData = new String(buffer.toByteArray(), "utf8");
+			
+			log.info("forward to url:" + url + "\nresp:" + resp.rawData);
 			
 		} catch (IOException e) {
 			log.error(e.toString(), e);

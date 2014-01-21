@@ -2,16 +2,16 @@ package org.emop.weixin.utils.impl;
 
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.emop.weixin.utils.Cache;
 
 
 public class SimpleCache implements Cache{
-	private Map<String, CacheItem> cache = new HashMap<String, CacheItem>();
+	private Map<String, CacheItem> cache = new ConcurrentHashMap<String, CacheItem>();
 
 	private long lastCleanUp = System.currentTimeMillis();
 

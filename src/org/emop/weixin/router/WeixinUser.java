@@ -1,6 +1,5 @@
 package org.emop.weixin.router;
 
-import org.emop.weixin.message.WeixinMessage;
 import org.emop.weixin.model.WeixinApp;
 
 

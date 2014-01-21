@@ -74,7 +74,7 @@ public class DefaultRouter implements Router {
 		
 		if(matched != null){
 			if(log.isDebugEnabled()){
-				log.debug("match rule:" + this.convertRuleToLine("na", matched));
+				log.debug("match rule:" + this.convertRuleToLine("input", matched));
 			}
 			next.actionName = matched.targetAction;
 			if(matched.appURL != null && matched.appURL.trim().length() > 1){
@@ -246,7 +246,11 @@ public class DefaultRouter implements Router {
 			}		
 			if(cmd.hasOption("ticket")){
 				r.ticket = cmd.getOptionValue("ticket");
-			}		
+			}
+			if(cmd.hasOption("content")){
+				r.content = cmd.getOptionValue("content");
+			}
+			
 			if(cmd.hasOption("jump")){
 				r.targetAction = cmd.getOptionValue("jump");
 			}

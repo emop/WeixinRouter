@@ -21,14 +21,19 @@ public class WeixinAccount {
 	public WeixinUser getUser(String name){
 		WeixinUser u = null;
 		Object o = cache.get(name);
-		if(o != null){
+		if(o == null){
+			u = new WeixinUser();
+			u.userID = name;
+			setUser(name, u);
+		}else {
 			u = (WeixinUser) o;
 		}
+		
 		return u;
 	}	
 	
 	public void setUser(String name, WeixinUser u){
 		u.account = this;
-		cache.set(name, u, 60 * 5);
+		cache.set(name, u, 60 * 15);
 	}
 }

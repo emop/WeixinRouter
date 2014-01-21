@@ -145,10 +145,17 @@ public class WeixinRouter {
 			byte[] tmp = new byte[1024 * 16];
 			for(int i = 0; i >= 0;){
 				i = ins.read(tmp);
-				buffer.write(tmp, 0, i);
+				if(i > 0){
+					buffer.write(tmp, 0, i);
+				}else {
+					break;
+				}
 			}
 			buffer.close();
 			msg.rawData = new String(buffer.toByteArray(), "utf8");
+			if(log.isDebugEnabled()){
+				log.info("read msg:" + msg.rawData);
+			}
 			msg.parseXMLData();
 		} catch (Exception e) {
 			log.error(e.toString(), e);
@@ -311,7 +318,7 @@ public class WeixinRouter {
 	}
 	
 	protected void formatLinkUrl(WeixinMessage msg, RouteSession s){
-		if(msg.items != null){
+		if(msg != null && msg.items != null){
 			
 			int index = 0;
 			for(ImageLinkItem item : msg.items){
@@ -408,8 +415,12 @@ public class WeixinRouter {
 			tmp.data.put("MsgType", "event");
 			tmp.data.put("Event", "init_route_table");
 			
-			resp = app.forwardMessage(httpClient, tmp, session);
-			routeTable.postProcess(resp, app, account, user);
+			WeixinMessage routeMsg = app.forwardMessage(httpClient, tmp, session);
+			if(routeMsg != null){
+				routeTable.postProcess(routeMsg, app, account, user);
+			}else {
+				log.warn("Failed to init app route table, session:" + session.toString());
+			}
 		}
 
 		if(routeTable != null && account != null && user != null && keyword != null){
@@ -418,9 +429,7 @@ public class WeixinRouter {
 			nextApp = app;
 		}
 		
-		if(resp == null){
-			resp = nextApp.forwardMessage(httpClient, msg, session);
-		}
+		resp = nextApp.forwardMessage(httpClient, msg, session);
 		
 		if(resp != null){
 			resp.account = account;

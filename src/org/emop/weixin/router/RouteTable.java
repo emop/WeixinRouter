@@ -16,6 +16,13 @@ import org.emop.wx.router.RouteException;
 import org.emop.wx.router.Router;
 import org.emop.wx.router.TargetURL;
 
+/**
+ * 微信消息转发路由表。每个应用会话有一个自己的转发规则。 
+ * 可以根据不同的消息类型转发，到不同的URL上面去。
+ * 
+ * @author deonwu
+ *
+ */
 public class RouteTable {
 	private static Log log = LogFactory.getLog("wx.route");
 	
@@ -46,6 +53,7 @@ public class RouteTable {
 		WeixinApp tmp = (WeixinApp)obj;
 		String content = msg.data.get(WeixinMessage.CONTENT);
 		if(msg.isText() && content != null && content.trim().equalsIgnoreCase(tmp.exitCommand)){
+			cache.remove(user.userID);
 			return root;
 		}
 		

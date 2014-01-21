@@ -49,7 +49,9 @@ public class XmlWeixinApp extends WeixinApp {
 			byte[] tmp = new byte[1024 * 16];
 			for(int i = 0; i >= 0;){
 				i = ins.read(tmp);
-				buffer.write(tmp, 0, i);
+				if(i > 0){
+					buffer.write(tmp, 0, i);
+				}
 			}
 			buffer.close();
 			

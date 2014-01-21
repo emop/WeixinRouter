@@ -263,6 +263,10 @@ public class DefaultRouter implements Router {
 				r.appToken = cmd.getOptionValue("app_token");
 			}
 			
+			if(cmd.hasOption("app_type")){
+				r.appType = cmd.getOptionValue("app_type");
+			}
+			
 			if(cmd.hasOption("expire")){
 				r.expired = parseTime(cmd.getOptionValue("expire"));
 			}			

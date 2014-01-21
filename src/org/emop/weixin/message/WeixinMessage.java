@@ -1,6 +1,9 @@
 package org.emop.weixin.message;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
@@ -132,7 +135,8 @@ public class WeixinMessage implements Cloneable {
 
 		Document doc = null;
 		try {
-			doc = builder.build(rawData);
+			InputStream ins = new ByteArrayInputStream(rawData.getBytes("utf8"));
+			doc = builder.build(new InputStreamReader(ins, "utf8"));
 		} catch (JDOMException e1) {
 		}
 		List<Element> elements = null;

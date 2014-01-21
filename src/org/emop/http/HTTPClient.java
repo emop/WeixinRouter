@@ -1,5 +1,6 @@
 package org.emop.http;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -157,11 +158,24 @@ public class HTTPClient {
 	    	if(format != null && format.equals("json")){
 		    	if(response != null){
 		    		HttpEntity entity = response.getEntity();
+		    		final StringBuilder tmpDebug = new StringBuilder();
 		    		InputStreamReader reader = new InputStreamReader(entity.getContent(), 
-		    				"UTF-8");
+		    				"UTF-8"){
+		    			public int read(char[] buf, int offset, int len) throws IOException{
+		    				int i = super.read(buf, offset, len);
+		    				if(i >= 0){
+		    					tmpDebug.append(buf, offset, i);
+		    				}
+		    				return i;
+		    			}
+		    		};
 		    		result.json = (JSONObject)JSONValue.parse(reader);
 		    		if(log.isDebugEnabled()){
-		    			log.debug("response json object:" + result.json.toJSONString());
+		    			if(result.json != null){
+		    				log.debug("response json object:" + result.json.toJSONString());
+		    			}else {
+		    				log.debug("response json object, failed to pase json:" + tmpDebug.toString());		    				
+		    			}
 		    		}
 		    		reader.close();
 		    		EntityUtils.consume(entity);

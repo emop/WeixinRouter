@@ -3,19 +3,7 @@ package org.emop.wx.router;
 
 public class Rule {
 
-	/*
-	public int sourceUserId = 0;
-	public long sourceShopId = 0;
-	public long sourceNumIid = 0;
-	public boolean sourceIsNewUser = false;
-	public boolean sourceIsMobile = false;
-	*/
-	//public String sourceIP = "";
-	//public String sourceShortKey = "";
-	
 	public String targetAction = "";
-	//public String nextUrl = "";
-	
 	
 	public String type = "";
 	public String event = "";

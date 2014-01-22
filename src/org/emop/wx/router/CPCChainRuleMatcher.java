@@ -25,8 +25,15 @@ public class CPCChainRuleMatcher implements RuleMatcher {
 	}
 	
 	private boolean checkContent(String s1, String s2){
-		if(s1.startsWith("/") && s2.matches(s1)){
-			return true;
+		if(s1.startsWith("/") && s1.endsWith("/")){
+			String t = s1.substring(1, s1.length() - 2);
+			if(!t.startsWith("^")){
+				t = ".*" + t;
+			}
+			if(!t.endsWith("$")){
+				t = t + ".*";
+			}
+			return s2.matches(t);
 		}
 		if(s1.equalsIgnoreCase(s2)){
 			return true;

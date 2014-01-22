@@ -50,7 +50,8 @@ public class RouteTable {
 		
 		if(obj == null || !(obj instanceof WeixinApp)){
 			TargetURL t = router.route(msg);
-			if(t != null && t.isOK){
+			if(t != null && t.isOK && 
+					!t.url.equals("root") ){  //root 一个特殊的关键字默认是根应用。
 				obj = createApp(t);
 				if(t.actionName.equals(Action.ENTER)){
 					cache.set(user.userID, obj, 60 * 30);

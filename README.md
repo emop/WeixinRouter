@@ -11,6 +11,7 @@ WeixinRouter
 *  支持友好的错误提示，应用接口超时。会返回微信客户端信息。
 *  支持多个应用接口集成。
 *  支持多模块消息转发。 *开发中*
+*  跨应用API调用接口 *开发中*
 
 
 路由规则配置
@@ -44,6 +45,23 @@ WeixinRouter
 ```bash
 route -A input -type text -content liu -j forward -app_type xml -app_url http://wx2.emop.cn/route/51/3000052/1357 -app_token cb05694fd559dcfbacbac57ae2547733
 route -A input -type text -content liu -j forward -app_type json -app_url http://emopselljd.sinaapp.com/api/wx_reply -app_token cb05694fd559dcfbacbac57ae2547733
+```
+
+应用API调用
+==========
+多个应用模块之间的相互调用，提供转发，认证服务。调用端，不需要关注被调用来自什么地方。只需要根据应用模块名
+就可以调用。
+
+例如:
+```php
+
+$shop = $api->core_shop_info(array('shop_id'=>1038));
+echo $shop->data->name;
+
+
+$user = $api->member_get_info(array('user_id'=>1038));
+echo $user->data->name;
+
 ```
 
 

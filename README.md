@@ -10,7 +10,7 @@ WeixinRouter
 *  支持接口统计功能
 *  支持友好的错误提示，应用接口超时。会返回微信客户端信息。
 *  支持多个应用接口集成。
-
+*  支持多模块消息转发。 *开发中*
 
 
 路由规则配置
@@ -22,12 +22,12 @@ WeixinRouter
 
 路由命令的格式：
 ```
- route -[AD] chain matchcondition -j action appinfo [-expire time]
+ route -[AD] chain matchcondition [-poll] -j action appinfo [-expire time]
  
  chain => input|log
   
  matchcondition => -[type|event|key|ticket|content]
- action => forward|enter
+ action => forward|enter|log
  appinfo => -[app_type|app_url|app_token]
 ```
 
@@ -35,7 +35,8 @@ WeixinRouter
 *  -[AD] -- 增加还是删除一个规则
 *  chain -- 规则匹配的链表，目前有效的链表只有input。
 *  matchcondition -- 消息匹配条件，支持type,event,key,content几个参数，具体值参考微信公众平台文档。
-*  action -- 转发的方式， forward-一次性转发， enter-切换式转发。
+*  -poll -- 支持预先尝试发送消息到应用。如果返回不处理，尝试下一个应用。
+*  action -- 转发的方式， forward-一次性转发， enter-切换式转发， log-只是把消息推送，不做响应检查。
 *  appinfo -- 转发的应用信息
 *  expire -- 规则过期时间，例如:10min
 

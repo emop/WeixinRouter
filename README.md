@@ -22,7 +22,7 @@ WeixinRouter
 
 路由命令的格式：
 ```
- route -[AD] chain matchcondition [-poll] -j action appinfo [-expire time]
+ route -[AD] chain matchcondition [-poll module] -j action appinfo [-expire time]
  
  chain => input|log
   

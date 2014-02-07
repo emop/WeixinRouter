@@ -14,14 +14,13 @@ public class CPCChainRuleMatcher implements RuleMatcher {
 	 */
 	@Override
 	public boolean isMatch(Rule r, Rule r2, boolean isStrict) {
-		//!(r.sourceUserId == r2.sourceUserId || (r.sourceUserId == 0 && !isStrict))
+		if(!checkContent(r.content, r2.content) && (!r.content.equals("") || isStrict)) return false;
 		if(!r.type.equalsIgnoreCase(r2.type) && (!r.type.equals("") || isStrict)) return false;
 		if(!r.event.equalsIgnoreCase(r2.event) && (!r.event.equals("") || isStrict)) return false;
 		if(!r.key.equalsIgnoreCase(r2.key) && (!r.key.equals("") || isStrict)) return false;
 		if(!r.ticket.equalsIgnoreCase(r2.ticket) && (!r.ticket.equals("") || isStrict)) return false;
-		if(!checkContent(r.content, r2.content) && (!r.content.equals("") || isStrict)) return false;
-		if((isStrict && r.pollModule.equals(r2.pollModule)) || (!isStrict && r.pollModule.length() > 0)){
-			return true;
+		if(isStrict && !r.pollModule.equalsIgnoreCase(r2.pollModule)){
+			return false;
 		}
 		
 		return true;

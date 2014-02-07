@@ -442,7 +442,7 @@ public class WeixinRouter {
 						iter.hasNext(); ){
 					final TargetURL target = iter.next();
 					if(target != null){
-						resp = routeTable.forwardTarget(target, httpClient, msg, session);
+						resp = routeTable.forwardTarget(target, httpClient, msg, session, user);
 					}
 					if(resp != null || target.isLast){
 						break;
@@ -451,14 +451,18 @@ public class WeixinRouter {
 			}else {				
 				resp = nextApp.forwardMessage(httpClient, msg, session);
 			}
-		}else {
-			resp = app.forwardMessage(httpClient, msg, session);
 		}
 		
+		//没有转发成功。
+		if(resp == null) {
+			resp = app.forwardMessage(httpClient, msg, session);
+			//nextApp = app;
+		}		
 		
 		if(resp != null){
 			resp.account = account;
-			resp.user = user;	
+			resp.user = user;
+			//resp.app = nextApp;
 			
 			if(routeTable != null) {
 				resp = routeTable.postProcess(resp, nextApp, account, user);

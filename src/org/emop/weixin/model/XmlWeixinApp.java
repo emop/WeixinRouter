@@ -31,6 +31,7 @@ public class XmlWeixinApp extends WeixinApp {
 		URLConnection conn = null;
 		InputStream ins = null;
 		WeixinMessage resp = new WeixinMessage();
+		resp.app = this;
 		try{
 			resp.formate = "xml";
 			

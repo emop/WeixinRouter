@@ -82,6 +82,7 @@ public class WeixinApp {
 		
 		WeixinMessage resp = null;
 		resp = new WeixinMessage();
+		resp.app = this;
 		resp.fromUserName = msg.toUserName;
 		resp.toUserName = msg.fromUserName;
 		if(r != null && r.json != null){

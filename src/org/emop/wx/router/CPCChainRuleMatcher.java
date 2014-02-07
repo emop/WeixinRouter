@@ -20,6 +20,9 @@ public class CPCChainRuleMatcher implements RuleMatcher {
 		if(!r.key.equalsIgnoreCase(r2.key) && (!r.key.equals("") || isStrict)) return false;
 		if(!r.ticket.equalsIgnoreCase(r2.ticket) && (!r.ticket.equals("") || isStrict)) return false;
 		if(!checkContent(r.content, r2.content) && (!r.content.equals("") || isStrict)) return false;
+		if((isStrict && r.pollModule.equals(r2.pollModule)) || (!isStrict && r.pollModule.length() > 0)){
+			return true;
+		}
 		
 		return true;
 	}

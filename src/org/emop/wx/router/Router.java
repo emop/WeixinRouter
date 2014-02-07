@@ -2,8 +2,7 @@ package org.emop.wx.router;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-
-import javax.servlet.http.HttpServletRequest;
+import java.util.Iterator;
 
 import org.emop.weixin.message.WeixinMessage;
 
@@ -14,6 +13,8 @@ import org.emop.weixin.message.WeixinMessage;
  */
 public interface Router {
 	public TargetURL route(WeixinMessage model);
+	
+	public Iterator<TargetURL> matchRule(WeixinMessage model);
 	
 	/**
 	 * 更新路由规则

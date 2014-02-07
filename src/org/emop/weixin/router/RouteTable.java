@@ -126,8 +126,8 @@ public class RouteTable {
 	 * @return
 	 */	
 	public Iterator<TargetURL> pollTarget(WeixinMessage msg, WeixinApp root, WeixinAccount account, WeixinUser user){
-		
-		return null;
+		this.root = root;		
+		return router.matchRule(msg);
 	}
 	
 	/**
@@ -140,9 +140,30 @@ public class RouteTable {
 	 * @param session
 	 * @return
 	 */
-	public WeixinMessage forwardTarget(TargetURL target, HTTPClient client, WeixinMessage msg, RouteSession session){
+	public WeixinMessage forwardTarget(TargetURL target, HTTPClient client, WeixinMessage msg, RouteSession session, WeixinUser user){
+		WeixinMessage resp = null;
+		WeixinApp app = null; //createApp(target);
+		if(target.isOK){
+			if(target.url.equalsIgnoreCase("root")){
+				resp = root.forwardMessage(client, msg, session);
+				if(resp != null){
+					resp.app = root;
+				}
+			}else {
+				app = createApp(target);
+				resp = app.forwardMessage(client, msg, session);
+				if(resp != null && resp.isResponseOK){
+					if(target.actionName.equals(Action.ENTER)){
+						cache.set(user.userID, app, 60 * 30);
+					}
+					resp.app = app;
+				}else {
+					resp = null;
+				}
+			}
+		}
 		
-		return null;
+		return resp;
 	}
 	
 	public WeixinMessage postProcess(WeixinMessage resp, WeixinApp app, WeixinAccount account, WeixinUser user){
@@ -215,6 +236,7 @@ public class RouteTable {
 			app = new WeixinApp();
 		}
 		
+		app.module = r.module;
 		app.appUrl = r.url;
 		app.appKey = r.token;
 		if(r.retCmd != null && r.retCmd.length() > 0){

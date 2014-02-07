@@ -7,10 +7,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -91,6 +92,47 @@ public class DefaultRouter implements Router {
 		
 		return next;
 	}
+	
+	@Override
+	public Iterator<TargetURL> matchRule(WeixinMessage model) {
+		Rule rule = new Rule();
+		//TargetURL next = new TargetURL();
+		
+		rule.type= model.msgType;
+		rule.event = model.data.containsKey("Event") ?  model.data.get("Event") : "";
+		rule.key = model.data.containsKey("EventKey") ?  model.data.get("EventKey") : "";
+		rule.ticket = model.data.containsKey("Ticket") ?  model.data.get("Ticket") : "";
+		rule.content = model.data.containsKey("Content") ?  model.data.get("Content") : "";
+		
+		List<Rule> matchedAll = input.matchAll(rule);
+		List<TargetURL> nextList = new ArrayList<TargetURL>(matchedAll.size());
+		
+		if(matchedAll.size() > 0){
+			for(Rule matched : matchedAll){
+				if(log.isDebugEnabled()){
+					log.debug("match rule:" + this.convertRuleToLine("input", matched));
+				}
+				TargetURL next = new TargetURL();
+				next.actionName = matched.targetAction;
+				if(matched.appURL != null && matched.appURL.trim().length() > 1){
+					next.isOK = true;
+					next.url = matched.appURL;
+					next.token = matched.appToken;
+					next.type = matched.appType;
+					next.module = matched.pollModule;
+				}
+				nextList.add(next);
+			}
+		}else {
+			if(log.isDebugEnabled()){
+				log.debug("not match:" + this.convertRuleToLine("na", rule));
+			}
+		}
+		
+		return nextList.iterator();
+	}
+	
+	
 
 	@Override
 	public boolean updateRouteTable(String expr) throws RouteException{
@@ -182,6 +224,10 @@ public class DefaultRouter implements Router {
 			c += " -content " + r.content;
 		}
 		
+		if(r.pollModule.length() > 0){
+			c += " -poll " + r.pollModule;			
+		}
+		
 		c += " -j " + r.targetAction;
 
 		if(r.appType.length() > 0){
@@ -250,6 +296,10 @@ public class DefaultRouter implements Router {
 			}
 			if(cmd.hasOption("content")){
 				r.content = cmd.getOptionValue("content");
+			}
+			
+			if(cmd.hasOption("poll")){
+				r.pollModule = cmd.getOptionValue("poll");	
 			}
 			
 			if(cmd.hasOption("jump")){
@@ -342,6 +392,9 @@ public class DefaultRouter implements Router {
 
 		o = new Option("c", "content", true, "match content");
 		options.addOption(o);
+		
+		o = new Option("p", "poll", true, "poll module");
+		options.addOption(o);		
 				
 		/**
 		 * 跳转和 过期命令参数。

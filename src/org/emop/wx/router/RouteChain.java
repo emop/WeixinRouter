@@ -18,6 +18,13 @@ public interface RouteChain {
 	public Rule match(Rule rule);
 	
 	/**
+	 * 匹配所有相关的规则。
+	 * @param rule
+	 * @return
+	 */
+	public List<Rule> matchAll(Rule rule);
+	
+	/**
 	 * 添加一条路由规则。
 	 * @param expr
 	 * @return

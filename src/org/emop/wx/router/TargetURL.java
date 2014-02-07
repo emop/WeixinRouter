@@ -15,6 +15,7 @@ public class TargetURL {
 	public String type = null;
 	public boolean isOK = false;
 	
+	public String module = null;
 	//public boolean writeLog = true;
 	
 	public String actionName = Action.FORWARD;

@@ -24,7 +24,7 @@ public class DefaultRouteChain implements RouteChain {
 	
 	@Override
 	public boolean addRoute(int index, Rule rule) {
-		if(match(rule, true, false) == null){
+		if(match(rule, true, false, 1).size() == 0){
 			w.lock();
 			try{
 				if(index >= 0 && index < rules.size()){
@@ -77,14 +77,25 @@ public class DefaultRouteChain implements RouteChain {
 
 	@Override
 	public Rule match(Rule rule) {
-		return match(rule, false, true);
+		List<Rule> matched = match(rule, false, true, 1);
+		if(matched.size() >= 1){
+			return matched.get(0);
+		}
+		
+		return null;
 	}
 	
-	protected Rule match(Rule rule, boolean strict, boolean retDef) {
+	@Override
+	public List<Rule> matchAll(Rule rule) {
+		return match(rule, false, true, Integer.MAX_VALUE);
+	}
+	
+	protected List<Rule> match(Rule rule, boolean strict, boolean retDef, int max) {
 		ArrayList<Rule> removed = null;
+		ArrayList<Rule> matched = new ArrayList<Rule>();
+
 		r.lock();
 		
-		Rule matched = null;
 		try{
 			long cur = System.currentTimeMillis();
 			for(Iterator<Rule> iter = rules.iterator(); iter.hasNext();){
@@ -95,10 +106,13 @@ public class DefaultRouteChain implements RouteChain {
 					}
 					removed.add(r);
 					continue;
-				} 
+				}
 				if(matcher.isMatch(r, rule, strict)){
-					matched = r;
-					break;
+					matched.add(r);
+					
+					if(matched.size() >= max){
+						break;
+					}
 				}
 			}
 		}finally{

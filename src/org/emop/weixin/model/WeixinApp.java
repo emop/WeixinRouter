@@ -35,6 +35,8 @@ public class WeixinApp {
 	
 	public String exitKeyword = "";
 	
+	public String module = "";
+	
 	/**
 	 * 定义应用是否会响应，退出消息。当接口进入到某个应用后。如果遇到了退出消息，且responseExit为true。
 	 * 当前消息会转发给当前会话应用。否则转发给根应用。
@@ -67,8 +69,10 @@ public class WeixinApp {
 		param.put("Url", msg.data.get("Url"));
 
 		param.put("Event", msg.data.get("Event"));
-		param.put("EventKey", msg.data.get("EventKey"));	
+		param.put("EventKey", msg.data.get("EventKey"));
 
+		param.put("wx_poll", module);
+		
 		param.put("wx_app_id", session.appId);
 		param.put("wx_user_id", session.userId);
 		param.put("wx_install_id", session.sessionId);

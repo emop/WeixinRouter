@@ -10,6 +10,7 @@ public class Rule {
 	public String key = "";
 	public String ticket = "";
 	public String content = "";
+	public String pollModule = "";
 	
 	public String appURL = "";
 	public String appToken = "";

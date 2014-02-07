@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -30,10 +31,11 @@ import org.emop.weixin.model.DataService;
 import org.emop.weixin.model.TaodianApi;
 import org.emop.weixin.model.WeixinApp;
 import org.emop.weixin.monitor.Benchmark;
-import org.emop.weixin.monitor.marks.WeixinRequest;
 import org.emop.weixin.router.interceptor.FansCount;
 import org.emop.weixin.utils.Cache;
 import org.emop.weixin.utils.impl.SimpleCache;
+import org.emop.wx.router.Action;
+import org.emop.wx.router.TargetURL;
 import org.mortbay.util.ajax.ContinuationSupport;
 
 /**
@@ -402,11 +404,11 @@ public class WeixinRouter {
 	 * 3. 消息是否是文本消息，是否匹配的关键字缓存。
 	 * 4. 转发消息到app
 	 */
-	protected WeixinMessage forwardWeixinMessage(RouteSession session, WeixinMessage msg, WeixinApp app){		
+	protected WeixinMessage forwardWeixinMessage(final RouteSession session, final WeixinMessage msg, final WeixinApp app){		
 		WeixinAccount account = dataService.getWeixinAccount(msg.toUserName);
 		WeixinUser user = dataService.getWeixinUser(account, msg.fromUserName);
 		
-		RouteTable routeTable = dataService.getRouteTable(session.toString());
+		final RouteTable routeTable = dataService.getRouteTable(session.toString());
 		//if		
 		String keyword = null;
 		if(msg.isText() || msg.isClick()){
@@ -434,16 +436,28 @@ public class WeixinRouter {
 		}
 
 		if(routeTable != null && account != null && user != null && keyword != null){
-			nextApp = routeTable.route(msg, app, account, user);			
+			nextApp = routeTable.currentApp(msg, app, account, user);
+			if(nextApp == null){
+				for(Iterator<TargetURL> iter = routeTable.pollTarget(msg, app, account, user);
+						iter.hasNext(); ){
+					final TargetURL target = iter.next();
+					if(target != null){
+						resp = routeTable.forwardTarget(target, httpClient, msg, session);
+					}
+					if(resp != null || target.isLast){
+						break;
+					}
+				}
+			}else {				
+				resp = nextApp.forwardMessage(httpClient, msg, session);
+			}
 		}else {
-			nextApp = app;
+			resp = app.forwardMessage(httpClient, msg, session);
 		}
 		
-		resp = nextApp.forwardMessage(httpClient, msg, session);
 		
 		if(resp != null){
 			resp.account = account;
-			resp.app = nextApp;
 			resp.user = user;	
 			
 			if(routeTable != null) {

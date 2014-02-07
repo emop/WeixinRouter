@@ -13,6 +13,8 @@ public class Action {
 	 * 进入某个应用，后续的操作都直接转发到这个应用上去。
 	 */
 	public static final String ENTER = "enter";
+
+	public static final String LOG = "log";
 	
 	/**
 	 * 退出当前应用。

@@ -35,6 +35,13 @@ public class WeixinApp {
 	
 	public String exitKeyword = "";
 	
+	/**
+	 * 定义应用是否会响应，退出消息。当接口进入到某个应用后。如果遇到了退出消息，且responseExit为true。
+	 * 当前消息会转发给当前会话应用。否则转发给根应用。
+	 * 
+	 */
+	public boolean responseExit = false;
+	
 	public boolean isEnabled(){
 		return statusCode > 1000 && statusCode < 1999;
 	}

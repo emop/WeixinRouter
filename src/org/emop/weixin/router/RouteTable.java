@@ -1,10 +1,12 @@
 package org.emop.weixin.router;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.emop.http.HTTPClient;
 import org.emop.weixin.message.WeixinMessage;
 import org.emop.weixin.model.WeixinApp;
 import org.emop.weixin.model.XmlWeixinApp;
@@ -74,6 +76,73 @@ public class RouteTable {
 		}
 		
 		return (WeixinApp)obj;
+	}
+	
+	public  WeixinApp currentApp(WeixinMessage msg, WeixinApp root, WeixinAccount account, WeixinUser user){
+		this.root = root;
+		Benchmark b = Benchmark.start("root", msg);
+		
+		String curApp = user.userID;
+		Object obj = cache.get(curApp, true);
+		if(obj != null){
+			log.debug("get session app for user:" + user.userID + ", app:" + obj);
+		}
+		
+		if(obj != null && (obj instanceof WeixinApp)){
+			WeixinApp tmp = (WeixinApp)obj;
+			String content = msg.data.get(WeixinMessage.CONTENT);
+			if(msg.isText() && content != null && content.trim().equalsIgnoreCase(tmp.exitCommand)){
+				cache.remove(user.userID);
+				/**
+				 * 如果遇到退出消息，直接切换为根应用。 这个地方有一个问题，就是根应用，不知道
+				 * 当前的应用是什么。就不知道怎么提示。
+				 * 
+				 * 如果把退出消息交给当前应用处理，如果应用没有定义关键字。会导致没有任何提示。
+				 */
+				if(!tmp.responseExit){
+					obj = root;
+				}
+			}
+		}
+		b.done();
+		history.add(b);
+		
+		if(obj != null && (obj instanceof WeixinApp)){
+			return (WeixinApp)obj;
+		}
+		
+		return null;
+	}	
+	
+	
+	/**
+	 * 轮询所有可能的跳转。route 方式是静态的确定一个跳转目标。 poll 方式是动态的，轮询尝试匹配的目标，
+	 * 直到一个目标接受消息并返回正确的结果。
+	 * 
+	 * @param msg
+	 * @param root
+	 * @param account
+	 * @param user
+	 * @return
+	 */	
+	public Iterator<TargetURL> pollTarget(WeixinMessage msg, WeixinApp root, WeixinAccount account, WeixinUser user){
+		
+		return null;
+	}
+	
+	/**
+	 * 转发消息到目标URL，需要和pollTarget配合使用。如果消息转发成功，而且转发的方式是Enter，需要保留
+	 * 当前会话的应用。
+	 * 
+	 * @param target
+	 * @param client
+	 * @param msg
+	 * @param session
+	 * @return
+	 */
+	public WeixinMessage forwardTarget(TargetURL target, HTTPClient client, WeixinMessage msg, RouteSession session){
+		
+		return null;
 	}
 	
 	public WeixinMessage postProcess(WeixinMessage resp, WeixinApp app, WeixinAccount account, WeixinUser user){

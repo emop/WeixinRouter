@@ -40,44 +40,6 @@ public class RouteTable {
 		return isnew;
 	}
 	
-	public  WeixinApp route(WeixinMessage msg, WeixinApp root, WeixinAccount account, WeixinUser user){
-		this.root = root;
-		Benchmark b = Benchmark.start("root", msg);
-		
-		String curApp = user.userID;
-		Object obj = cache.get(curApp, true);
-		if(obj != null){
-			log.debug("get session app for user:" + user.userID + ", app:" + obj);
-		}
-		
-		if(obj == null || !(obj instanceof WeixinApp)){
-			TargetURL t = router.route(msg);
-			if(t != null && t.isOK && 
-					!t.url.equals("root") ){  //root 一个特殊的关键字默认是根应用。
-				obj = createApp(t);
-				if(t.actionName.equals(Action.ENTER)){
-					cache.set(user.userID, obj, 60 * 30);
-				}
-			}
-		}else {	//如果存在已经关联的会话，检查是否遇到退出会话的命令。如果是退出命令，就删除会话回到根菜单。
-			WeixinApp tmp = (WeixinApp)obj;
-			String content = msg.data.get(WeixinMessage.CONTENT);
-			if(msg.isText() && content != null && content.trim().equalsIgnoreCase(tmp.exitCommand)){
-				cache.remove(user.userID);
-				//return root;
-				obj = null;
-			}
-		}
-		b.done();
-		history.add(b);
-		
-		if(obj == null || !(obj instanceof WeixinApp)){
-			return root;
-		}
-		
-		return (WeixinApp)obj;
-	}
-	
 	public  WeixinApp currentApp(WeixinMessage msg, WeixinApp root, WeixinAccount account, WeixinUser user){
 		this.root = root;
 		Benchmark b = Benchmark.start("root", msg);

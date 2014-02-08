@@ -441,7 +441,7 @@ public class WeixinRouter {
 				for(Iterator<TargetURL> iter = routeTable.pollTarget(msg, app, account, user);
 						iter.hasNext(); ){
 					final TargetURL target = iter.next();
-					if(target != null){
+					if(target.isOK){
 						resp = routeTable.forwardTarget(target, httpClient, msg, session, user);
 					}
 					if(resp != null || target.isLast){

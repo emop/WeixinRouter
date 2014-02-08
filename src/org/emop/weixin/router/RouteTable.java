@@ -143,23 +143,22 @@ public class RouteTable {
 	public WeixinMessage forwardTarget(TargetURL target, HTTPClient client, WeixinMessage msg, RouteSession session, WeixinUser user){
 		WeixinMessage resp = null;
 		WeixinApp app = null; //createApp(target);
-		if(target.isOK){
-			if(target.url.equalsIgnoreCase("root")){
-				resp = root.forwardMessage(client, msg, session);
-				if(resp != null){
-					resp.app = root;
+		
+		if(target.url.equalsIgnoreCase("root")){
+			resp = root.forwardMessage(client, msg, session);
+			if(resp != null){
+				resp.app = root;
+			}
+		}else {
+			app = createApp(target);
+			resp = app.forwardMessage(client, msg, session);
+			if(resp != null && resp.isResponseOK){
+				if(target.actionName.equals(Action.ENTER)){
+					cache.set(user.userID, app, 60 * 30);
 				}
+				resp.app = app;
 			}else {
-				app = createApp(target);
-				resp = app.forwardMessage(client, msg, session);
-				if(resp != null && resp.isResponseOK){
-					if(target.actionName.equals(Action.ENTER)){
-						cache.set(user.userID, app, 60 * 30);
-					}
-					resp.app = app;
-				}else {
-					resp = null;
-				}
+				resp = null;
 			}
 		}
 		

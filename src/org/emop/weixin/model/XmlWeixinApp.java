@@ -60,7 +60,7 @@ public class XmlWeixinApp extends WeixinApp {
 			//if(log.d)
 			
 			resp.rawData = new String(buffer.toByteArray(), "utf8");
-			
+			resp.isResponseOK = true;
 			log.info("forward to url:" + url + "\nresp:" + resp.rawData);
 			
 		} catch (IOException e) {

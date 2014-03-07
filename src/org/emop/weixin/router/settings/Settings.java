@@ -17,6 +17,7 @@ public class Settings {
 	public final static String HTTP_PORT = "http_port";
 	public final static String TD_API_ID = "td_api_id";
 	public final static String TD_API_SECRET = "td_api_secret";
+	public final static String TD_API_ROUTE = "td_api_route";
 
 	public final static String CORE_ROUTE_THREAD_COUNT = "core_route_thread_count";
 	public final static String MAX_ROUTE_THREAD_COUNT = "max_route_thread_count";

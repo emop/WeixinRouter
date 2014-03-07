@@ -44,8 +44,9 @@ public class HttpServer {
 		
 		String appKey = settings.getString(Settings.TD_API_ID, "23");
 		String appSecret = settings.getString(Settings.TD_API_SECRET, "5e969f648a49364841936ad6da0b18a9");
+		String apiRoute = settings.getString(Settings.TD_API_ROUTE, "http://fmei.sinaapp.com/api/route");
 
-		TaodianApi api = new TaodianApi(appKey, appSecret, null);
+		TaodianApi api = new TaodianApi(appKey, appSecret, apiRoute);
 		
 		DataService service = new HTTPDataService(api);
 		WeixinRouter.router = new WeixinRouter(threadPool, service);

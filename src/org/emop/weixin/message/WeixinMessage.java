@@ -74,6 +74,8 @@ public class WeixinMessage implements Cloneable {
 	public void writeTo(PrintWriter writer){
 		if(this.formate.equals("xml")){
 			writer.write(rawData);
+		}else if(msgType != null && msgType.equals("empty")){
+			writer.println("");				
 		}else {
 			long writeTime = System.currentTimeMillis() / 1000;
 			writer.println("<xml>");

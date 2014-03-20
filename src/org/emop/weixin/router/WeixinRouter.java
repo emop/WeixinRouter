@@ -352,11 +352,12 @@ public class WeixinRouter {
 	}
 	
 	protected synchronized String convertImageUrl(String image, int width){
-		imageCount = (imageCount + 1) % 10000000 + 1;
+		//imageCount = (imageCount + 1) % 10000000 + 1;
 		
-		imageShortUrl.set(imageCount + "", image, 60 * 60 * 24 * 7);
+		String ck = TaodianApi.MD5(image);
+		imageShortUrl.set(ck, image, 60 * 60 * 24 * 7);
 		
-		return String.format("/img/%s_%s.jpg", imageCount, width);
+		return String.format("/img/%s_%s.jpg", ck, width);
 		//return image;
 	}
 	

@@ -97,6 +97,8 @@ public class WeixinMessage implements Cloneable {
 			writeNewBody(writer);
 		}else if(msgType != null && msgType.equals("music")){
 			writeMusicBody(writer);
+		}else if(msgType != null && (msgType.equals("image") || msgType.equals("voice"))){
+			writeMediaBody(writer);
 		}else {
 			writeTextBody(writer);
 		}
@@ -122,6 +124,15 @@ public class WeixinMessage implements Cloneable {
 		writer.println("<HQMusicUrl><![CDATA[" + data.get("HQMusicUrl") +"]]></HQMusicUrl>");
 		
 		writer.println("</Music>");
+	}
+	
+	protected void writeMediaBody(PrintWriter writer){
+		String tag = msgType;
+		tag = tag.substring(0, 1).toUpperCase() + tag.substring(1);
+		
+		writer.println("<" + tag + ">");
+		writer.println("<MediaId><![CDATA[" + data.get("MediaId") + "]]></MediaId>");	
+		writer.println("</" + tag + ">");
 	}
 	
 	protected void writeTextBody(PrintWriter writer){

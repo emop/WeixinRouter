@@ -97,6 +97,8 @@ public class WeixinRouter {
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.setCharacterEncoding("utf8");
 		response.setContentType("text/xml");
+		response.addHeader("Cache-Control", "no-cache");
+		response.addHeader("Pragma", "no-cache");
 		
 		if(log.isDebugEnabled()){
 			log.debug("start request:" + request.getRequestURI());

@@ -23,6 +23,8 @@ public class StatusServlet extends HttpServlet {
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.setCharacterEncoding("utf8");
 		response.setContentType("text/plain");
+		response.addHeader("Cache-Control", "no-cache");
+		response.addHeader("Pragma", "no-cache");
 		
 		StatusMonitor.output(response.getWriter());
     }

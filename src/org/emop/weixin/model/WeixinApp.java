@@ -101,6 +101,8 @@ public class WeixinApp {
 				resp.data.put("Description", r.getString("Description"));
 				resp.data.put("MusicUrl", r.getString("MusicUrl"));
 				resp.data.put("HQMusicUrl", r.getString("HQMusicUrl"));
+			}else {
+				resp.data.put("MediaId", r.getString("MediaId"));				
 			}
 			
 			resp.command = r.getString("command");

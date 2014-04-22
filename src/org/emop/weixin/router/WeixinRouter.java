@@ -4,6 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,7 +36,6 @@ import org.emop.weixin.monitor.Benchmark;
 import org.emop.weixin.router.interceptor.FansCount;
 import org.emop.weixin.utils.Cache;
 import org.emop.weixin.utils.impl.SimpleCache;
-import org.emop.wx.router.Action;
 import org.emop.wx.router.TargetURL;
 import org.mortbay.util.ajax.ContinuationSupport;
 
@@ -336,15 +337,17 @@ public class WeixinRouter {
 			for(ImageLinkItem item : msg.items){
 				String url = item.PicUrl;
 				if(url != null && url.trim().length() > 0){
-					/*
-					try {
-						url = URLEncoder.encode(url.trim(), "UTF-8");
-					} catch (UnsupportedEncodingException e) {
-					}
-					*/
-					
 					int width = (index == 0) ? 400 : 80;
-					item.PicUrl = s.hostUrl + convertImageUrl(url, width); // "/img/?img=" + url;
+
+					if(s.hostUrl.indexOf("wx-img") >= 0){
+						try {
+							url = URLEncoder.encode(url.trim(), "UTF-8");
+						} catch (UnsupportedEncodingException e) {
+						}
+						item.PicUrl = s.hostUrl + "/img/?img=" + url + "&width=" + width;						
+					}else {						
+						item.PicUrl = s.hostUrl + convertImageUrl(url, width); // "/img/?img=" + url;
+					}
 				}
 				index++;
 			}

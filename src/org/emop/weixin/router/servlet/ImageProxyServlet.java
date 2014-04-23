@@ -42,8 +42,8 @@ public class ImageProxyServlet extends HttpServlet{
 		DataInfo info = getDataInfo(request);
 		
 		response.setContentType("image/jpg");
-		response.addHeader("Cache-Control", "max-age=7200");
-		response.addDateHeader("Expires", System.currentTimeMillis() + 7200 * 1000 + 8 * 60 * 60 * 1000);
+		response.addHeader("Cache-Control", "max-age=86400");
+		response.addDateHeader("Expires", System.currentTimeMillis() + 86400 * 1000 + 8 * 60 * 60 * 1000);
 		
 		byte[] data = getImageData(info.url, info.intWidth);
 		if(data != null && data.length > 100){
